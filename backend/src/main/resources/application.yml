@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: deployguard
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/deployguard}
+    username: ${SPRING_DATASOURCE_USERNAME:deployguard}
+    password: ${SPRING_DATASOURCE_PASSWORD:deployguard}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  graphql:
+    graphiql:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+deployguard:
+  encryption-key: ${DEPLOYGUARD_ENCRYPTION_KEY:}
+  jwt:
+    secret: ${DEPLOYGUARD_JWT_SECRET:}
+    access-token-expiry-seconds: 900
+    refresh-token-expiry-seconds: 604800
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    show-sql: true
+  graphql:
+    graphiql:
+      enabled: true
+
+logging:
+  level:
+    com.daniyalmlik: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+---
+spring:
+  config:
+    activate:
+      on-profile: ci
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    com.daniyalmlik: INFO
